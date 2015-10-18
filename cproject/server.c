@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = 5000;
+	server.sin_port = htons(5000);
 
 
 	if(bind(sock, (struct sockaddr *)&server, sizeof(server)))
