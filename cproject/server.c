@@ -9,12 +9,12 @@
 
 int main(void)
 {
-	int serveFd, connectionFd;
+	int serverFd, connectionFd;
 	struct sockaddr_in servaddr;
 	char timebuffer[MAX_BUFFER+1];
 	time_t currentTime;
 
-	serveFd = socket(AF_INET, SOCK_STREAM, 0);
+	serverFd = socket(AF_INET, SOCK_STREAM, 0);
 
 	memset(&servaddr, 0,sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
