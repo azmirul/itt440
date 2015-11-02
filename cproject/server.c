@@ -1,43 +1,40 @@
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
-#define MAX_BUFFER		128
-#define DAYTIME_SERVER_PORT	13
-
-int main(void)
+int main(int argc, char *argv[])
 {
-	int serverFd, connectionFd;
-	struct sockaddr_in servaddr;
-	char timebuffer[MAX_BUFFER+1];
-	time_t currentTime;
+	int listenfd = 0, connfd = 0;
+	struct sockaddr_in serv_addr;
+	char sendBuff[1025];
+	time_t ticks;
 
-	serverFd = socket(AF_INET, SOCK_STREAM, 0);
+	listenfd = socket(AF_INET, SOCK_STREAM, 0);
 
-	memset(&servaddr, 0,sizeof(servaddr));
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(DAYTIME_SERVER_PORT);
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	serv_addr.sin_port = htons(5000);
 
-	bind(serverFD,
-		(struct sockaddr *)&servaddr, sizeof(servaddr));
+	bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-	listen(serverFD, 5);
+	listen(listenfd, 10);
 
 	while ( 1 )
 	{
-		connectionFd = accept(serverFd, (struct sockaddr *)NULL, NULL);
+		connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
 
-		if(connectionFd >= 0)
-		{
-			currentTime = time(NULL);
-			snprintf(timebuffer, MAX_BUFFER, "%s\n", ctime(&currentTime));
+		ticks = time(NULL);
+		snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks));
+		write(connfd, sendBuff, strlen(sendBuff));
 
-			write(connectionFd, timebuffer, strlen(timebuffer));
-
-			close(connectionFd);
-		}
+		close(connfd);
+		sleep(1);
 	}
 }
